@@ -4,6 +4,7 @@
 #include<vector>
 #include<string>
 #include<fstream>
+#include <limits>
 using namespace std;
 
 struct UserInfo {
@@ -11,9 +12,30 @@ struct UserInfo {
 	string UserPassword;
 };
 
+struct Friends {
+	string from;   //谁加
+	string to;   //加谁
+};
+
+struct Message {
+	string from;
+	string to;
+	string contents;
+	bool is_read;
+};
+
+struct FriendRequest {
+	string from;
+	string to;
+};
+
 class UserManager {
 private:
 	vector<UserInfo>userlist;
+	vector<Friends>friendslist;
+	vector<FriendRequest>friendrequestlist;
+	vector<Message>messagelist;
+	string currentUser;
 public:
 	//写入信息
 	bool SaveInfo();
@@ -23,7 +45,12 @@ public:
 	bool Login(const string &name,const string &pwd);
 	//注册界面
 	bool Sign_up(const string &name,const string &pwd);
+	int UnreadCount();
+	int RequestCount();
 };
 
 
+
 void chat_start(UserManager& mgr);
+void ShowMainPage(UserManager& mgr);
+void chat(UserManager& mgr);

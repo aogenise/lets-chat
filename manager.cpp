@@ -8,6 +8,7 @@ using namespace std;
 bool UserManager::Login(const string& name, const string& pwd) {
 	for (const auto& user : userlist) {
 		if (user.Username == name&&user.UserPassword == pwd) {
+			currentUser = name;
 			return true;
 		}
 	}
@@ -28,6 +29,7 @@ bool UserManager::Sign_up(const string& name,const string& pwd) {
 	newUser.Username = name;
 	newUser.UserPassword = pwd;
 	userlist.push_back(newUser);
+	currentUser = name;
 	return true;
 }
 
@@ -38,8 +40,6 @@ bool UserManager::Sign_up(const string& name,const string& pwd) {
 bool UserManager::LoadInfo() {
 	ifstream ifs("info.txt");    //创建ifstream(文本阅读器)类型的对象ifs，读取info.txt
 	if (!ifs.is_open()) {
-		cout << "File not found";
-		Sleep(2000);
 		return false;
 	}
 	userlist.clear();    //先清空，防止重复读入
@@ -66,8 +66,6 @@ bool UserManager::SaveInfo() {
 	ofstream ofs("info.txt");
 	
 	if (!ofs.is_open()) {
-		cout << "File not found!";
-		Sleep(2000);
 		return false;
 	}
 	for (const auto& user:userlist) {
@@ -75,4 +73,30 @@ bool UserManager::SaveInfo() {
 	}
 	ofs.close();
 	return true;
+}
+
+
+/*
+函数:UnreadCount
+功能:记录没有看过的信息数。如果说这条信息是我的，并且我并没有看过，那么就加一
+*/
+
+int UserManager::UnreadCount() {
+	int n=0;
+	for(auto m:messagelist) {
+		if (m.to == currentUser && !m.is_read) {
+			n++;
+		}
+	}
+	return n;
+}
+
+int UserManager::RequestCount() {
+	int n=0;
+	for (auto m : friendrequestlist) {
+		if (m.to == currentUser) {
+			n++;
+		}
+	}
+	return n;
 }
