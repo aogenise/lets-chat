@@ -101,22 +101,22 @@ void ShowMainPage(UserManager &mgr){
 		}
 		switch (choose) {
 		case 1:
-			/*聊天函数chat*/
+			chat(mgr);
 			break;
 		case 2:
-			/*通讯录函数Contacts*/
+			contacts(mgr);
 			break;
 		case 3:
 			/*好友动态函数*/
 			break;
 		case 4:
-			/*好友申请函数*/
-			break;
+			friend_request(mgr);
+			break; 
 		case 5:
-			/*添加好友函数*/
+			add_friend(mgr);
 			break;
 		case 6:
-			/*登出账号函数*/
+			return;
 			break;
 		default:
 			cout << "invalid option.please try again"<<endl;
@@ -130,5 +130,87 @@ void ShowMainPage(UserManager &mgr){
 功能:遍历用户好友，进行聊天
 */
 void chat(UserManager& mgr) {
+	system("cls");
+	for (const auto &name : mgr.GetMyFriends()){
+		cout << name;
+		int unread = mgr.GetUnreadCount(name);
+			if (unread!= 0) {
+				cout << "(" << unread << "unread)";
+			}
+			cout << endl;
+		}
+	}
 
+void contacts(UserManager& mgr) {
+	system("cls");
+	int n = 1;
+	for (const auto& m : mgr.GetMyFriends()) {
+		cout << n++ << m<<endl;
+	}
 }
+
+/*
+函数:friend_feed
+功能:打印好友动态，给出发表入口
+*/
+void friend_feed(UserManager& mgr) {
+	if (!mgr.HasFeedPosts()) {
+		cout << "No post available.";
+	}
+	else {
+		vector<string> result = mgr.GetFeed();
+		for (const auto m : result) {
+			cout << m;
+		}
+	}
+	cout << "post a status?(y/n):";
+	string m;
+	cin >> m;
+	if (m == "y" || m == "yes") {
+		cout << "please enter your post content";
+		string con;
+		cin >> con;
+
+	}
+	return;
+}
+
+/*
+函数:friend_request
+功能:查看现有的好友申请，并且决定是否同意
+*/
+void friend_request(UserManager& mgr) {
+	system("cls");
+	int n=1;
+	vector<string>result = mgr.GetRequest();
+	for (const auto name : mgr.GetRequest()) {
+		cout << n++ << ":" << name << endl;
+	}
+	cout << "please select a friend request to accept:";
+	int m;
+	cin >> m;
+	string requester = result[m - 1]; //发起申请人的名字
+	mgr.AcceptFriendRequest(requester);
+}
+
+
+
+/*
+函数:add_friend
+功能:添加好友
+*/
+void add_friend(UserManager& mgr) {
+	system("cls");
+	cout << "please enter your friend's name:";
+	string name;
+	cin >> name;
+	if (mgr.UserExists(name) == true) {
+		cout << "Friend added successfuly!";
+		return;
+	}
+	else {
+		cout << "User not found,please exit or try again";
+		return;
+	}
+}
+

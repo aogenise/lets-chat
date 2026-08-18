@@ -4,7 +4,9 @@ using namespace std;
 int main() {
 	UserManager Mgr;
 	Mgr.LoadInfo();
-	chat_start(Mgr);
+	while (1) {
+		chat_start(Mgr);
+	}
 	return 0;
 }
 
