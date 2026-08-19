@@ -66,12 +66,18 @@ public:
 	int GetUnreadCount(const string &friendname);
 	//将动态加入动态流
 	void EnterPost(const string& content);
+	//将信息加入信息流
+	void AddMassage(const string& content,const string& name);
+	//标记已读
+	void Read();
 	//返回动态信息
 	vector<string> GetFeed();
 	//返回好友列表
 	vector<string>GetMyFriends();
 	//返回好友申请列表
 	vector<string>GetRequest();
+	//返回信息列表
+	vector<string>GetMassage(const string& name);
 };
 
 

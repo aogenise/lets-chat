@@ -38,13 +38,15 @@ bool UserManager::Sign_up(const string& name,const string& pwd) {
 功能:加载账号信息
 */
 bool UserManager::LoadInfo() {
-	ifstream ifs("info.txt");    //创建ifstream(文本阅读器)类型的对象ifs，读取info.txt
+	//读取userlist
+	string line;
+	ifstream ifs("data/userlist.txt");    //创建ifstream(文本阅读器)类型的对象ifs，读取info.txt
 	if (!ifs.is_open()) {
 		return false;
 	}
 	userlist.clear();    //先清空，防止重复读入
-	string line;       //将数据暂存在line 
 	while (getline(ifs, line)) {
+		if (line.empty())continue;
 		size_t pos = line.find('|');
 		if (pos == string::npos) {
 			continue;
@@ -55,6 +57,91 @@ bool UserManager::LoadInfo() {
 		userlist.push_back(U);
 	}
 	ifs.close();
+
+	//读取friendlist
+	ifstream ifs("data/friendlist.txt");
+	if (!ifs.is_open()) {
+		return false;
+	}
+	friendslist.clear();
+	while (getline(ifs, line)) {
+		if (line.empty())continue;
+		size_t pos = line.find('|');
+		if (pos == string::npos) {
+			continue;
+		}
+		Friends Fr;
+		Fr.from = line.substr(0, pos);
+		Fr.to = line.substr(pos + 1);
+		friendslist.push_back(Fr);
+	}
+	ifs.close();
+
+	//读取friendrequestlist
+	ifstream ifs("data/friendrequestlist.txt");
+	if (!ifs.is_open()) {
+		return false;
+	}
+	friendrequestlist.clear();
+	while (getline(ifs, line)) {
+		if (line.empty())continue;
+		size_t pos = line.find('|');
+		if (pos == string::npos) {
+			continue;
+		}
+		FriendRequest Fr;
+		Fr.from = line.substr(0, pos);
+		Fr.to = line.substr(pos + 1);
+		friendrequestlist.push_back(Fr);
+	}
+	ifs.close();
+	
+	//存messagelist
+
+	ifstream ifs("data/messagelist.txt");
+	if (!ifs.is_open()) {
+		return false;
+	}
+	messagelist.clear();
+	while (getline(ifs, line)) {
+		if (line.empty())continue;
+		size_t pos1 = line.find('|');
+		size_t pos2 = line.find('|', pos1+1);
+		size_t pos3 = line.find('|', pos2+1);
+		if (pos1 == string::npos|| pos2 == string::npos|| pos3 == string::npos) {
+			continue;
+		}
+		Message Me;
+		Me.from = line.substr(0, pos1);
+		Me.to = line.substr(pos1 + 1,pos2-(pos1+1));
+		Me.contents = line.substr(pos2 + 1, pos3-(pos2+1));
+		string a = line.substr(pos3+1);
+		if (a == "1")Me.is_read = true;
+		else Me.is_read = false;
+		messagelist.push_back(Me);
+	}
+	ifs.close();
+	
+	//存Feedlist
+
+	ifstream ifs("data/feedlist.txt");
+	if (!ifs.is_open()) {
+		return false;
+	}
+	Feedlist.clear();
+	while (getline(ifs, line)) {
+		if (line.empty())continue;
+		size_t pos = line.find('|');
+		if (pos == string::npos) {
+			continue;
+		}
+		FriendFeed Fe;
+		Fe.name = line.substr(0, pos);
+		Fe.contents = line.substr(pos + 1);
+		Feedlist.push_back(Fe);
+	}
+	ifs.close();
+
 	return true;
 }
 
@@ -63,7 +150,8 @@ bool UserManager::LoadInfo() {
 功能:写入账户信息
 */
 bool UserManager::SaveInfo() {
-	ofstream ofs("info.txt");
+	//写入userlist
+	ofstream ofs("data/userlist.txt");
 	
 	if (!ofs.is_open()) {
 		return false;
@@ -72,6 +160,51 @@ bool UserManager::SaveInfo() {
 		ofs << user.Username << "|" << user.UserPassword << "\n";
 	}
 	ofs.close();
+
+	//写入friendslist
+	ofstream ofs("data/friendlist.txt");
+
+	if (!ofs.is_open()) {
+		return false;
+	}
+	for (const auto& fr : friendslist) {
+		ofs << fr.from << "|" << fr.to << "\n";
+	}
+	ofs.close();
+
+	//写入friendrequestlist
+	ofstream ofs("data/friendrequestlist.txt");
+
+	if (!ofs.is_open()) {
+		return false;
+	}
+	for (const auto& fr : friendrequestlist) {
+		ofs << fr.from << "|" << fr.to << "\n";
+	}
+	ofs.close();
+
+	//写入massagelist
+	ofstream ofs("data/message.txt");
+
+	if (!ofs.is_open()) {
+		return false;
+	}
+	for (const auto& ma : messagelist) {
+		ofs << ma.from << "|" << ma.to <<"|" << ma.contents <<"|" << (ma.is_read ? "1" : "0") << "\n";
+	}
+	ofs.close();
+
+	//写入feedlist
+	ofstream ofs("data/feedlist.txt");
+
+	if (!ofs.is_open()) {
+		return false;
+	}
+	for (const auto& fe:Feedlist) {
+		ofs << fe.name << "|" << fe.contents << "\n";
+	}
+	ofs.close();
+
 	return true;
 }
 
@@ -113,7 +246,7 @@ int UserManager::RequestCount() {
 int UserManager::GetUnreadCount(const string &friendname) {
 	int n = 0;
 	for (auto m : messagelist) {
-		if ((m.to == currentUser && m.from == friendname && !m.is_read )||(m.from==currentUser&&m.to==friendname && !m.is_read)) {
+		if (m.to == currentUser && m.from == friendname && !m.is_read ) {
 			n++;
 		}
 	}
@@ -238,4 +371,49 @@ bool UserManager::IsFriend(const string& name) {
 		if (m.to == name && m.from == currentUser); return true;
 	}
 	return false;
+}
+
+
+/*
+函数:GetMassage
+功能:返回展示字符串
+*/
+vector<string>UserManager::GetMassage(const string& name) {
+	vector<string>result;
+	for (const auto m : messagelist) {
+		if (m.to == currentUser || m.from == currentUser) {
+			result.push_back(m.from + ":\n  " + m.contents);
+		}
+	}
+	return result;
+}
+
+
+/*
+函数:AddMassage
+功能:将信息添加到信息流
+*/
+void UserManager::AddMassage(const string& content,const string& name) {
+	string From = currentUser;
+	string To = name;
+	string Contents = content;
+	Message m;
+	m.from = From;
+	m.to = To;
+	m.contents = Contents;
+	m.is_read = false;
+	messagelist.push_back(m);
+}
+
+
+/*
+函数:Read
+功能:标记已读
+*/
+void UserManager::Read() {
+	for (auto &m : messagelist) {
+		if (m.to == currentUser) {
+			m.is_read = true;
+		}
+	}
 }

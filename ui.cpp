@@ -130,15 +130,36 @@ void ShowMainPage(UserManager &mgr){
 功能:遍历用户好友，进行聊天
 */
 void chat(UserManager& mgr) {
-	system("cls");
-	for (const auto &name : mgr.GetMyFriends()){
-		cout << name;
-		int unread = mgr.GetUnreadCount(name);
-			if (unread!= 0) {
+	while (1) {
+		system("cls");
+		for (const auto& name : mgr.GetMyFriends()) {
+			cout << name;
+			int unread = mgr.GetUnreadCount(name);
+			if (unread != 0) {
 				cout << "(" << unread << "unread)";
 			}
 			cout << endl;
 		}
+		vector<string>fri = mgr.GetMyFriends();
+		cout << "please select a conversation(0 to exits)";
+		int temp;
+		cin >> temp;
+		if (temp == 0)return;
+		system("cls");
+		string name = fri[temp - 1];
+		while (1) {
+			for (const auto m : mgr.GetMassage(name)) {
+				cout << m;
+			}
+			mgr.Read();
+			cout << "please enter...(0 exits):";
+			string temp2;
+			cin >> temp2;
+			if (temp2 == "0")break;
+			mgr.AddMassage(temp2, name);
+			system("cls");
+		}
+	}
 	}
 
 void contacts(UserManager& mgr) {
