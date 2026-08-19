@@ -59,12 +59,12 @@ bool UserManager::LoadInfo() {
 	ifs.close();
 
 	//读取friendlist
-	ifstream ifs("data/friendlist.txt");
-	if (!ifs.is_open()) {
+	ifstream ifs1("data/friendlist.txt");
+	if (!ifs1.is_open()) {
 		return false;
 	}
 	friendslist.clear();
-	while (getline(ifs, line)) {
+	while (getline(ifs1, line)) {
 		if (line.empty())continue;
 		size_t pos = line.find('|');
 		if (pos == string::npos) {
@@ -75,15 +75,15 @@ bool UserManager::LoadInfo() {
 		Fr.to = line.substr(pos + 1);
 		friendslist.push_back(Fr);
 	}
-	ifs.close();
+	ifs1.close();
 
 	//读取friendrequestlist
-	ifstream ifs("data/friendrequestlist.txt");
-	if (!ifs.is_open()) {
+	ifstream ifs2("data/friendrequestlist.txt");
+	if (!ifs2.is_open()) {
 		return false;
 	}
 	friendrequestlist.clear();
-	while (getline(ifs, line)) {
+	while (getline(ifs2, line)) {
 		if (line.empty())continue;
 		size_t pos = line.find('|');
 		if (pos == string::npos) {
@@ -94,16 +94,16 @@ bool UserManager::LoadInfo() {
 		Fr.to = line.substr(pos + 1);
 		friendrequestlist.push_back(Fr);
 	}
-	ifs.close();
+	ifs2.close();
 	
 	//存messagelist
 
-	ifstream ifs("data/messagelist.txt");
-	if (!ifs.is_open()) {
+	ifstream ifs3("data/messagelist.txt");
+	if (!ifs3.is_open()) {
 		return false;
 	}
 	messagelist.clear();
-	while (getline(ifs, line)) {
+	while (getline(ifs3, line)) {
 		if (line.empty())continue;
 		size_t pos1 = line.find('|');
 		size_t pos2 = line.find('|', pos1+1);
@@ -120,16 +120,16 @@ bool UserManager::LoadInfo() {
 		else Me.is_read = false;
 		messagelist.push_back(Me);
 	}
-	ifs.close();
+	ifs3.close();
 	
 	//存Feedlist
 
-	ifstream ifs("data/feedlist.txt");
-	if (!ifs.is_open()) {
+	ifstream ifs4("data/feedlist.txt");
+	if (!ifs4.is_open()) {
 		return false;
 	}
 	Feedlist.clear();
-	while (getline(ifs, line)) {
+	while (getline(ifs4, line)) {
 		if (line.empty())continue;
 		size_t pos = line.find('|');
 		if (pos == string::npos) {
@@ -140,7 +140,7 @@ bool UserManager::LoadInfo() {
 		Fe.contents = line.substr(pos + 1);
 		Feedlist.push_back(Fe);
 	}
-	ifs.close();
+	ifs4.close();
 
 	return true;
 }
@@ -162,48 +162,48 @@ bool UserManager::SaveInfo() {
 	ofs.close();
 
 	//写入friendslist
-	ofstream ofs("data/friendlist.txt");
+	ofstream ofs1("data/friendlist.txt");
 
-	if (!ofs.is_open()) {
+	if (!ofs1.is_open()) {
 		return false;
 	}
 	for (const auto& fr : friendslist) {
-		ofs << fr.from << "|" << fr.to << "\n";
+		ofs1 << fr.from << "|" << fr.to << "\n";
 	}
-	ofs.close();
+	ofs1.close();
 
 	//写入friendrequestlist
-	ofstream ofs("data/friendrequestlist.txt");
+	ofstream ofs2("data/friendrequestlist.txt");
 
-	if (!ofs.is_open()) {
+	if (!ofs2.is_open()) {
 		return false;
 	}
 	for (const auto& fr : friendrequestlist) {
-		ofs << fr.from << "|" << fr.to << "\n";
+		ofs2 << fr.from << "|" << fr.to << "\n";
 	}
-	ofs.close();
+	ofs2.close();
 
 	//写入massagelist
-	ofstream ofs("data/message.txt");
+	ofstream ofs3("data/messagelist.txt");
 
-	if (!ofs.is_open()) {
+	if (!ofs3.is_open()) {
 		return false;
 	}
 	for (const auto& ma : messagelist) {
-		ofs << ma.from << "|" << ma.to <<"|" << ma.contents <<"|" << (ma.is_read ? "1" : "0") << "\n";
+		ofs3 << ma.from << "|" << ma.to <<"|" << ma.contents <<"|" << (ma.is_read ? "1" : "0") << "\n";
 	}
-	ofs.close();
+	ofs3.close();
 
 	//写入feedlist
-	ofstream ofs("data/feedlist.txt");
+	ofstream ofs4("data/feedlist.txt");
 
-	if (!ofs.is_open()) {
+	if (!ofs4.is_open()) {
 		return false;
 	}
 	for (const auto& fe:Feedlist) {
-		ofs << fe.name << "|" << fe.contents << "\n";
+		ofs4 << fe.name << "|" << fe.contents << "\n";
 	}
-	ofs.close();
+	ofs4.close();
 
 	return true;
 }
@@ -339,7 +339,7 @@ bool UserManager::HasFeedPosts() {
 vector<string>UserManager::GetFeed() {
 	vector<string>result;
 	for (const auto& m : Feedlist) {
-		if (IsFriend(m.name)) {
+		if (m.name==currentUser||IsFriend(m.name)) {
 			result.push_back(m.name+":\n     "+m.contents);
 		}
 	}
@@ -367,8 +367,8 @@ void UserManager::EnterPost(const string& content) {
 */
 bool UserManager::IsFriend(const string& name) {
 	for (const auto m : friendslist) {
-		if (m.from == name && m.to == currentUser); return true;
-		if (m.to == name && m.from == currentUser); return true;
+		if (m.from == name && m.to == currentUser) return true;
+		if (m.to == name && m.from == currentUser) return true;
 	}
 	return false;
 }

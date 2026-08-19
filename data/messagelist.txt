@@ -1,0 +1,9 @@
+littlexu|amy|111|1
+littlexu|amy|hello|1
+amy|littlexu|hello~|0
+amy|littlexu|nice|0
+amy|littlexu|to|0
+amy|littlexu|meet|0
+amy|littlexu|you|0
+amy|littlexu|hello,amy|0
+amy|littlexu|what are you doing?|0

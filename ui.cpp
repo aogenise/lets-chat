@@ -72,6 +72,8 @@ try_again:
 功能:展示主界面
 */
 void ShowMainPage(UserManager &mgr){
+	while (true) {
+		system("cls");
 	cout << "let's chat!";
 	if (mgr.UnreadCount()!= 0) {
 		cout << "(" << mgr.UnreadCount() << " unread)";
@@ -90,7 +92,7 @@ void ShowMainPage(UserManager &mgr){
 	cout << "6.Sign Out" << endl;
 	int choose;
 
-	while (true) {
+	
 		cout << "Please select an operation:";
 		cin >> choose;
 		if (!cin) {
@@ -107,7 +109,7 @@ void ShowMainPage(UserManager &mgr){
 			contacts(mgr);
 			break;
 		case 3:
-			/*好友动态函数*/
+			friend_feed(mgr);
 			break;
 		case 4:
 			friend_request(mgr);
@@ -116,6 +118,7 @@ void ShowMainPage(UserManager &mgr){
 			add_friend(mgr);
 			break;
 		case 6:
+			mgr.SaveInfo();
 			return;
 			break;
 		default:
@@ -144,17 +147,18 @@ void chat(UserManager& mgr) {
 		cout << "please select a conversation(0 to exits)";
 		int temp;
 		cin >> temp;
+		cin.ignore();
 		if (temp == 0)return;
 		system("cls");
 		string name = fri[temp - 1];
 		while (1) {
 			for (const auto m : mgr.GetMassage(name)) {
-				cout << m;
+				cout << m<<endl;
 			}
 			mgr.Read();
-			cout << "please enter...(0 exits):";
+			cout << endl << "please enter...(0 exits):";
 			string temp2;
-			cin >> temp2;
+			getline(cin,temp2);
 			if (temp2 == "0")break;
 			mgr.AddMassage(temp2, name);
 			system("cls");
@@ -166,8 +170,9 @@ void contacts(UserManager& mgr) {
 	system("cls");
 	int n = 1;
 	for (const auto& m : mgr.GetMyFriends()) {
-		cout << n++ << m<<endl;
+		cout << n++ <<"." << m << endl;
 	}
+	Sleep(1000);
 }
 
 /*
@@ -175,23 +180,27 @@ void contacts(UserManager& mgr) {
 功能:打印好友动态，给出发表入口
 */
 void friend_feed(UserManager& mgr) {
+	system("cls");
 	if (!mgr.HasFeedPosts()) {
-		cout << "No post available.";
+		cout << "No post available."<<endl;
 	}
 	else {
 		vector<string> result = mgr.GetFeed();
 		for (const auto m : result) {
-			cout << m;
+			cout << m<<endl;
 		}
 	}
 	cout << "post a status?(y/n):";
 	string m;
 	cin >> m;
-	if (m == "y" || m == "yes") {
-		cout << "please enter your post content";
+	if (m == "y" || m == "yes"||m=="Y"||m=="Yes") {
+		cin.ignore();
+		cout << "please enter your post content:";
 		string con;
-		cin >> con;
-
+		getline(cin, con);
+		mgr.EnterPost(con);
+		cout << "successful!";
+		Sleep(1000);
 	}
 	return;
 }
@@ -212,6 +221,7 @@ void friend_request(UserManager& mgr) {
 	cin >> m;
 	string requester = result[m - 1]; //发起申请人的名字
 	mgr.AcceptFriendRequest(requester);
+	cout << "Added successfuly!";
 }
 
 
@@ -226,11 +236,13 @@ void add_friend(UserManager& mgr) {
 	string name;
 	cin >> name;
 	if (mgr.UserExists(name) == true) {
-		cout << "Friend added successfuly!";
+		cout << "Friend added successfuly!"<<endl;
+		Sleep(1000);
 		return;
 	}
 	else {
 		cout << "User not found,please exit or try again";
+		Sleep(1000);
 		return;
 	}
 }
