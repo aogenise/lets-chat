@@ -274,10 +274,6 @@ vector<string>UserManager::GetMyFriends() {
 bool UserManager::UserExists(const string& name) {
 	for (const auto& m : userlist) {
 		if (m.Username == name) {
-			struct FriendRequest request;
-			request.from = currentUser;
-			request.to = name;
-			friendrequestlist.push_back(request);
 			return true;
 		}
 	}
@@ -381,7 +377,7 @@ bool UserManager::IsFriend(const string& name) {
 vector<string>UserManager::GetMassage(const string& name) {
 	vector<string>result;
 	for (const auto m : messagelist) {
-		if (m.to == currentUser || m.from == currentUser) {
+		if ((m.to == name&&m.from==currentUser) ||( m.from == name&&m.to==currentUser)) {
 			result.push_back(m.from + ":\n  " + m.contents);
 		}
 	}
@@ -410,10 +406,32 @@ void UserManager::AddMassage(const string& content,const string& name) {
 函数:Read
 功能:标记已读
 */
-void UserManager::Read() {
+void UserManager::Read(const string& friendname) {
 	for (auto &m : messagelist) {
-		if (m.to == currentUser) {
+		if ((m.to == currentUser&&m.from==friendname)||(m.from==currentUser&&m.to==friendname)) {
 			m.is_read = true;
 		}
 	}
+}
+
+
+
+/*
+函数:SentFriendRequest
+功能:发送好友申请
+*/
+bool UserManager::SentFriendRequest(const string& name) {
+	if (name == currentUser || !UserExists(name) || IsFriend(name)) {
+		return false;
+	}
+	for (const auto m : friendrequestlist) {
+		if ((m.from == currentUser && m.to == name) || (m.to == currentUser && m.from == name)) {
+			return false;
+		}
+	}
+	struct FriendRequest request;
+	request.from = currentUser;
+	request.to = name;
+	friendrequestlist.push_back(request);
+	return true;
 }

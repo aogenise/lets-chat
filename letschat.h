@@ -58,6 +58,8 @@ public:
 	bool HasFeedPosts();
 	//判断是否是我的好友
 	bool IsFriend(const string& name);
+	//添加好友
+	bool SentFriendRequest(const string& name);
 	//统计未读消息总数
 	int UnreadCount();
 	//统计请求总数
@@ -69,7 +71,7 @@ public:
 	//将信息加入信息流
 	void AddMassage(const string& content,const string& name);
 	//标记已读
-	void Read();
+	void Read(const string& friendname);
 	//返回动态信息
 	vector<string> GetFeed();
 	//返回好友列表

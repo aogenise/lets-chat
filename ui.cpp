@@ -147,15 +147,25 @@ void chat(UserManager& mgr) {
 		cout << "please select a conversation(0 to exits)";
 		int temp;
 		cin >> temp;
-		cin.ignore();
+		if (!cin) {
+			cin.clear();
+			while (cin.get() != '\n');
+			cout << "invalid option.please try again" << endl;
+			continue;
+		}
 		if (temp == 0)return;
+		if (temp > fri.size() || temp < 1) {
+			cout << "invalid option.please try again" << endl;
+			continue;
+		}
+		cin.ignore();
 		system("cls");
 		string name = fri[temp - 1];
 		while (1) {
 			for (const auto m : mgr.GetMassage(name)) {
 				cout << m<<endl;
 			}
-			mgr.Read();
+			mgr.Read(name);
 			cout << endl << "please enter...(0 exits):";
 			string temp2;
 			getline(cin,temp2);
@@ -213,13 +223,24 @@ void friend_request(UserManager& mgr) {
 	system("cls");
 	int n=1;
 	vector<string>result = mgr.GetRequest();
+	if (result.size() == 0) {
+		cout << "No Pending friend request.";
+		return;
+	}
 	for (const auto name : mgr.GetRequest()) {
 		cout << n++ << ":" << name << endl;
 	}
 	cout << "please select a friend request to accept:";
 	int m;
 	cin >> m;
+	if (!cin || m > result.size()||m<1) {
+		cin.clear();
+		while (cin.get() != '\n');
+		cout << "invalid option.please try again" << endl;
+		return;
+	}
 	string requester = result[m - 1]; //发起申请人的名字
+	
 	mgr.AcceptFriendRequest(requester);
 	cout << "Added successfuly!";
 }
@@ -235,8 +256,8 @@ void add_friend(UserManager& mgr) {
 	cout << "please enter your friend's name:";
 	string name;
 	cin >> name;
-	if (mgr.UserExists(name) == true) {
-		cout << "Friend added successfuly!"<<endl;
+	if (mgr.SentFriendRequest(name) == true) {
+		cout << "Friend request sent."<<endl;
 		Sleep(1000);
 		return;
 	}
