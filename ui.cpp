@@ -262,7 +262,7 @@ void add_friend(UserManager& mgr) {
 		return;
 	}
 	else {
-		cout << "User not found,please exit or try again";
+		cout << "Failed to send request(already friends, duplicate, or user not found";
 		Sleep(1000);
 		return;
 	}
